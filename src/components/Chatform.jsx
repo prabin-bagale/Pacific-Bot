@@ -10,9 +10,9 @@ const Chatform = ({setChatHistory,generateBotResponse,chatHistory}) => {
       // update chat history with user's message
       setChatHistory((history)=> [...history,{role:"user",text:userMessage}]);
 
-      // Adding "Thinking.." placeholder for the bot's response
+      // Adding "Thinking..." placeholder for the bot's response
       setTimeout(()=>setChatHistory((history)=> [...history,{role: "model", text: "Thinking..." }]),
-      generateBotResponse([...chatHistory,{role:"user",text:userMessage}]),600);
+      generateBotResponse([...chatHistory,{role:"user",text:`Using the detailsprovided above, please address this query:${userMessage}`}]),600);
       
   }
 
