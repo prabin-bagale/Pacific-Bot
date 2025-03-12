@@ -9,15 +9,15 @@ const App = () => {
   const [chatHistory,setChatHistory] = useState([
     {
       hideInChat: true,
-      role:"model",
-      text:companyInfo
+      role: "model",
+      text: companyInfo,
     }
   ]);
   const [showChatbot,setShowChatBot] = useState(false);
   const chatBodyRef = useRef()
   const generateBotResponse = async (history) =>{
     // Helper function  to update chat history
-    const updateHistory=(text,isError = false)=>{
+    const updateHistory=(text, isError = false)=>{
       setChatHistory(prev => [...prev.filter(msg=>msg.text !== "Thinking..."),{role:"model",text}, isError])
     }
     // Format chat history For API Request
