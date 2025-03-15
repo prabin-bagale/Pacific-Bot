@@ -13,16 +13,22 @@ const App = () => {
       text: companyInfo,
     }
   ]);
+  console.log("🚀 ~ App ~ chatHistory:", chatHistory)
   const [showChatbot,setShowChatBot] = useState(false);
   const chatBodyRef = useRef()
-  const generateBotResponse = async (history) =>{
+  const generateBotResponse = async (history,userText) =>{
     // Helper function  to update chat history
-    const updateHistory=(text, isError = false)=>{
-      setChatHistory(prev => [...prev.filter(msg=>msg.text !== "Thinking..."),{role:"model",text}, isError])
-    }
+    const updateHistory = (text, isError = false) => {
+      setChatHistory(prev => [
+        ...prev.filter(msg => msg.text !== "Thinking..."),
+        { role: "model", text, isError }
+      ]);
+    };
+    
     // Format chat history For API Request
     history = history.map(({role,text})=>({role,parts:[{text}]}));
 
+    console.log("🚀 ~ generateBotResponse ~ history:", history[history.length -1].text)
    const requestOptions ={
     method:"POST",
     headers: {"Content-Type": "application/json"},
@@ -32,9 +38,20 @@ const App = () => {
     // Make a API call to get the bot's response
     const response = await fetch(import.meta.env.VITE_API_URL, requestOptions)
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error.message || "Something Went Wrong!") 
+    console.log("🚀 ~ generateBotResponse ~ data:", data)
+    if (!response.ok) throw new Error("Something Went Wrong ! Please Try Again ") 
       // Clean and update chat history with bot's response
-      const apiResponsetText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim();
+      
+      let regex = /\*\*(.*?)\*\*/g;
+      let apiResponsetText = data.candidates[0].content.parts[0].text;
+      console.log("🚀 ~ generateBotResponse ~ apiResponsetText:", regex.test(apiResponsetText))
+      
+      if (apiResponsetText.includes(userText)) {
+          apiResponsetText = "Sorry I didn't understand";
+      } else {
+          apiResponsetText = apiResponsetText.replace(regex, "$1").trim();
+      }
+      
     updateHistory(apiResponsetText)
     
    } catch (error) {
