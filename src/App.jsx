@@ -1,8 +1,7 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ChatbotIcon from './components/ChatbotIcon'
 import Chatform from './components/Chatform'
 import ChatMessage from './components/ChatMessage'
-import { useEffect } from 'react'
 import { companyInfo } from './Companyinfo'
 
 const App = () => {
@@ -13,62 +12,38 @@ const App = () => {
       text: companyInfo,
     }
   ]);
-  console.log("🚀 ~ App ~ chatHistory:", chatHistory)
   const [showChatbot,setShowChatBot] = useState(false);
   const chatBodyRef = useRef()
-  const generateBotResponse = async (history,userText) =>{
-    // Helper function  to update chat history
-    const updateHistory = (text, isError = false) => {
-      setChatHistory(prev => [
-        ...prev.filter(msg => msg.text !== "Thinking..."),
-        { role: "model", text, isError }
-      ]);
-    };
-    
-    // Format chat history For API Request
-    history = history.map(({role,text})=>({role,parts:[{text}]}));
-
-    console.log("🚀 ~ generateBotResponse ~ history:", history[history.length -1].text)
-   const requestOptions ={
-    method:"POST",
-    headers: {"Content-Type": "application/json"},
-    body:JSON.stringify({contents: history})
-   }
-   try {
-    // Make a API call to get the bot's response
-    const response = await fetch(import.meta.env.VITE_API_URL, requestOptions)
-    const data = await response.json();
-    console.log("🚀 ~ generateBotResponse ~ data:", data)
-    if (!response.ok) throw new Error("Something Went Wrong ! Please Try Again ") 
-      // Clean and update chat history with bot's response
-      
-      let regex = /\*\*(.*?)\*\*/g;
-      let apiResponsetText = data.candidates[0].content.parts[0].text;
-      console.log("🚀 ~ generateBotResponse ~ apiResponsetText:", regex.test(apiResponsetText))
-      
-      if (apiResponsetText.includes(userText)) {
-          apiResponsetText = "Sorry I didn't understand";
-      } else {
-          apiResponsetText = apiResponsetText.replace(regex, "$1").trim();
-      }
-      
-    updateHistory(apiResponsetText)
-    
-   } catch (error) {
-    updateHistory(error.message, true)
-    
-   }
+  const generateBotResponse = async (history) =>{
+    // helper fun to update chat history
+    const updateHistory =(text) =>{
+      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role:"model",text}]);
+    }
+    // Formate chat history for API request 
+    history = history.map(({role,text})=> ({role,parts:[{text}]}));
+    const requestOptions = {
+      method:"POST",
+      headers: {"Content-type": "application/json"},
+      body: JSON.stringify({contents:history})
+    }
+    try{
+      // Make APi call to get the bot's response
+      const response = await fetch(import.meta.env.VITE_API_URL,requestOptions);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error.message || "Something went wrong!")
+        // Clean and update chat history with bot's response
+        const apiResponseText = data.candidates[0].contents.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim();
+      updateHistory(apiResponseText)
+    }catch(error){
+      console.log(error);  
+    }
   };
-  useEffect(()=>{
-    // Auto-scroll whenever chat history updates
-    chatBodyRef.current.scrollTo({top: chatBodyRef.current.scrollHeight, behaviour:"smooth"})
+  useEffect(() =>{
+// Auto-scroll whenever chat history updates
+    chatBodyRef.current.scrollTo({top: chatBodyRef.current.scrollHeight,behaviour:"smooth"});
   },[chatHistory])
   return (
-    <div className={`container ${showChatbot ? "show-chatbot" : ""}`}>
-      <button onClick={()=> setShowChatBot(prev => !prev)} id="chatbot-toggler">
-        <span className="material-symbols-rounded">mode_comment</span>
-        <span className="material-symbols-rounded">close</span>
-      </button>
+    <div className="container">
       <div className="chatbot-popup">
         {/*Chatbot Header */}
         <div className="chat-header">
