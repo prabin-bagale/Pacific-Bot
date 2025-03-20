@@ -16,8 +16,8 @@ const App = () => {
   const chatBodyRef = useRef()
   const generateBotResponse = async (history) =>{
     // helper fun to update chat history
-    const updateHistory =(text) =>{
-      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role:"model",text}]);
+    const updateHistory =(text,isError = false) =>{
+      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role:"model",text,isError}]);
     }
     // Formate chat history for API request 
     history = history.map(({role,text})=> ({role,parts:[{text}]}));
@@ -35,7 +35,7 @@ const App = () => {
         const apiResponseText = data.candidates[0].contents.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim();
       updateHistory(apiResponseText)
     }catch(error){
-      console.log(error);  
+      updateHistory(error.message, true)
     }
   };
   useEffect(() =>{
@@ -43,7 +43,11 @@ const App = () => {
     chatBodyRef.current.scrollTo({top: chatBodyRef.current.scrollHeight,behaviour:"smooth"});
   },[chatHistory])
   return (
-    <div className="container">
+    <div className={`container ${showChatbot ? "show-chatbot" : ""}`}>
+      <button onClick={()=> setShowChatBot(prev => !prev)} id="chatbot-toggler">
+        <span className="material-symbols-rounded">mode_comment</span>
+        <span className="material-symbols-rounded">close</span>
+      </button>
       <div className="chatbot-popup">
         {/*Chatbot Header */}
         <div className="chat-header">
