@@ -17,22 +17,24 @@ const App = () => {
   const generateBotResponse = async (history) =>{
     // helper fun to update chat history
     const updateHistory =(text,isError = false) =>{
-      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role:"model",text,isError}]);
+      setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role: "model", text, isError}]);
     }
     // Formate chat history for API request 
     history = history.map(({role,text})=> ({role,parts:[{text}]}));
     const requestOptions = {
       method:"POST",
-      headers: {"Content-type": "application/json"},
-      body: JSON.stringify({contents:history})
+      headers:  { "Content-Type": "application/json" },
+      body: JSON.stringify({contents: history})
     }
+
     try{
       // Make APi call to get the bot's response
       const response = await fetch(import.meta.env.VITE_API_URL,requestOptions);
       const data = await response.json();
+    
       if (!response.ok) throw new Error(data.error.message || "Something went wrong!")
         // Clean and update chat history with bot's response
-        const apiResponseText = data.candidates[0].contents.parts[0].text.replace(/\*\*(.*?)\*\*/g,"$1").trim();
+        const apiResponseText = data.candidates[0].content.parts[0].text.replace(/\*\*(.*?)\*\*/g, "$1").trim();
       updateHistory(apiResponseText)
     }catch(error){
       updateHistory(error.message, true)
