@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import ChatbotIcon from './components/ChatbotIcon'
 import Chatform from './components/Chatform'
 import ChatMessage from './components/ChatMessage'
+import TypingIndicator from './components/TypingIndicator'
 import { companyInfo } from './Companyinfo'
 
 const App = () => {
@@ -13,11 +14,14 @@ const App = () => {
     }
   ]);
   const [showChatbot,setShowChatBot] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
   const chatBodyRef = useRef()
+
   const generateBotResponse = async (history) =>{
     // helper fun to update chat history
     const updateHistory =(text,isError = false) =>{
       setChatHistory(prev => [...prev.filter(msg => msg.text !== "Thinking..."),{role: "model", text, isError}]);
+      setIsTyping(false);
     }
     // Formate chat history for API request 
     history = history.map(({role,text})=> ({role,parts:[{text}]}));
@@ -40,10 +44,12 @@ const App = () => {
       updateHistory(error.message, true)
     }
   };
+
   useEffect(() =>{
-// Auto-scroll whenever chat history updates
+    // Auto-scroll whenever chat history updates
     chatBodyRef.current.scrollTo({top: chatBodyRef.current.scrollHeight,behaviour:"smooth"});
-  },[chatHistory])
+  }, [chatHistory]);
+
   return (
     <div className={`container ${showChatbot ? "show-chatbot" : ""}`}>
       <button onClick={()=> setShowChatBot(prev => !prev)} id="chatbot-toggler">
@@ -64,19 +70,31 @@ const App = () => {
          {/*Chatbot Body */}
          <div ref={chatBodyRef} className="chat-body">
               <div className="message bot-message">
-              <ChatbotIcon/>
-              <p className='message-text'>
-                Hey Dear 👋 <br /> How can i help You?
-              </p>
+                <ChatbotIcon/>
+                <p className='message-text'>
+                  Hey Dear 👋 <br /> How can i help You?
+                </p>
+                <span className="message-timestamp">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
               {/* render the chat history dynamically */}
               {chatHistory.map((chat,index)=>(
                 <ChatMessage key={index} chat={chat} />
               ))}
+              {isTyping && (
+                <div className="message bot-message">
+                  <ChatbotIcon/>
+                  <TypingIndicator />
+                </div>
+              )}
          </div>
          {/*Chatbot Footer */}
          <div className="chat-footer">
-          <Chatform chatHistory={chatHistory} setChatHistory={setChatHistory} generateBotResponse={generateBotResponse}/>
+          <Chatform 
+            chatHistory={chatHistory} 
+            setChatHistory={setChatHistory} 
+            generateBotResponse={generateBotResponse}
+            setIsTyping={setIsTyping}
+          />
          </div>
       </div>
     </div>
