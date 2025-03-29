@@ -1,7 +1,38 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 const Chatform = ({ setChatHistory, generateBotResponse, chatHistory, setIsTyping }) => {
   const inputRef = useRef();
+  const [isListening, setIsListening] = useState(false);
+
+  const startVoiceRecognition = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new window.webkitSpeechRecognition();
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = () => {
+        setIsListening(true);
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        inputRef.current.value = transcript;
+      };
+
+      recognition.onerror = (event) => {
+        console.error('Speech recognition error:', event.error);
+      };
+
+      recognition.onend = () => {
+        setIsListening(false);
+      };
+
+      recognition.start();
+    } else {
+      alert('Speech recognition is not supported in your browser.');
+    }
+  };
 
   const handleFormSubmit = (e) => {
     e.preventDefault();
@@ -24,7 +55,10 @@ const Chatform = ({ setChatHistory, generateBotResponse, chatHistory, setIsTypin
   return (
     <form action="#" className="chat-form" onSubmit={handleFormSubmit}>
       <input ref={inputRef} type="text" placeholder="Message..." className="message-input" required />
-      <button className="material-symbols-rounded">arrow_upward</button>
+      <button type="button" className={`material-symbols-rounded mic-button ${isListening ? 'listening' : ''}`} onClick={startVoiceRecognition}>
+        mic
+      </button>
+      <button type="submit" className="material-symbols-rounded">arrow_upward</button>
     </form>
   );
 };
