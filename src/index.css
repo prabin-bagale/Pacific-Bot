@@ -206,10 +206,35 @@ transition: all 0.2s ease;
     flex-shrink: 0;
     transition: 0.2s ease;
 }
+
+.chat-form .mic-button {
+    display: block;
+    background: #6D4FC2;
+    margin-right: 6px;
+}
+
+.chat-form .mic-button.listening {
+    background: #ff4444;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
 .chat-form button:hover{
     background: #593bab;
 }
-.chat-form .message-input:valid ~ button{
+
+.chat-form .message-input:valid ~ button:not(.mic-button){
     display: block;
 }
 
