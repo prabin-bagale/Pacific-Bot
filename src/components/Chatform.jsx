@@ -34,17 +34,36 @@ const Chatform = ({ setChatHistory, generateBotResponse, chatHistory, setIsTypin
     }
   };
 
+  const updateMessageStatus = (messageId, status) => {
+    setChatHistory(prev => 
+      prev.map(msg => 
+        msg.id === messageId ? { ...msg, status } : msg
+      )
+    );
+  };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
     const userMessage = inputRef.current.value.trim();
     if (!userMessage) return;
     inputRef.current.value = "";
 
+    const messageId = Date.now(); // Generate unique ID for the message
+
     // Update chat history with user's message
-    setChatHistory((history) => [...history, { role: "user", text: userMessage }]);
+    setChatHistory((history) => [...history, { 
+      id: messageId,
+      role: "user", 
+      text: userMessage,
+      status: 'sent'
+    }]);
 
     // Show typing indicator
     setIsTyping(true);
+
+    // Simulate message delivery and read status
+    setTimeout(() => updateMessageStatus(messageId, 'delivered'), 1000);
+    setTimeout(() => updateMessageStatus(messageId, 'read'), 2000);
 
     // Call generateBotResponse after a short delay
     setTimeout(() => {
