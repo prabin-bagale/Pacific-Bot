@@ -141,15 +141,40 @@ transition: all 0.2s ease;
     white-space: pre-line;
     font-size: 0.95rem;
 }
+
+.message-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.message-info {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: 45px;
+}
+
 .message-timestamp {
     font-size: 0.75rem;
     color: #888;
-    margin-left: 45px;
 }
+
+.message-status {
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.message-status .material-symbols-rounded {
+    font-size: 1rem;
+}
+
 .chat-body .bot-message .message-text{
     background: #F6F2FF;
     border-radius: 13px 13px 13px 3px;
 }
+
 .chat-body .user-message{
     flex-direction: column;
     align-items: flex-end;
@@ -160,10 +185,12 @@ transition: all 0.2s ease;
     background: #6D4FC2;
     border-radius: 13px 13px 3px 13px;
 }
-.chat-body .user-message .message-timestamp {
+
+.chat-body .user-message .message-info {
     margin-left: 0;
     margin-right: 45px;
 }
+
 .chat-footer{
     position: absolute;
     bottom: 0;
