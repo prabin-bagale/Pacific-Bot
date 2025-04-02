@@ -115,6 +115,48 @@ transition: all 0.2s ease;
     scrollbar-width: thin;
     scrollbar-color: #DDD3F9 transparent;
 }
+
+/* Quick Actions Styles */
+.quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 15px;
+    background: #F6F2FF;
+    border-radius: 13px;
+    margin-bottom: 10px;
+}
+
+.quick-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 20px;
+    background: #fff;
+    color: #6D4FC2;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.quick-action-btn:hover {
+    background: #6D4FC2;
+    color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.quick-action-btn .material-symbols-rounded {
+    font-size: 1.2rem;
+}
+
+.action-label {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
 .chat-body .message{
     display: flex;
     align-items: flex-start;
