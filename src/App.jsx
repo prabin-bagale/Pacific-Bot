@@ -3,6 +3,7 @@ import ChatbotIcon from './components/ChatbotIcon'
 import Chatform from './components/Chatform'
 import ChatMessage from './components/ChatMessage'
 import TypingIndicator from './components/TypingIndicator'
+import QuickActions from './components/QuickActions'
 import { companyInfo } from './Companyinfo'
 
 const App = () => {
@@ -16,6 +17,22 @@ const App = () => {
   const [showChatbot,setShowChatBot] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const chatBodyRef = useRef()
+
+  const handleQuickAction = (action) => {
+    let response = '';
+    switch(action) {
+      case 'menu':
+        response = `Here's our menu:\n\nSignature Coffee:\n- Espresso Shot - $3.50\n- Cappuccino - $4.00\n- Latte (Classic/Vanilla/Caramel) - $4.50\n- Mocha - $5.00\n\nSpecialty Brews:\n- Cold Brew - $4.50\n- Nitro Cold Brew - $5.50\n- Single-Origin Pour Over - $5.00\n\nSeasonal Favorites:\n- Pumpkin Spice Latte - $5.50\n- Peppermint Mocha - $5.50\n\nTea & Alternatives:\n- Matcha Latte - $5.00\n- Chai Latte - $4.50\n- Hot Chocolate - $4.00\n\nSnacks & Pastries:\n- Croissant (Butter/Almond) - $3.50\n- Muffins (Blueberry/Chocolate Chip) - $3.00\n- Avocado Toast - $6.00\n- Bagel with Cream Cheese - $4.00`;
+        break;
+      case 'hours':
+        response = "We're open:\nMonday to Friday: 7:00 AM - 9:00 PM\nWeekends: 8:00 AM - 10:00 PM";
+        break;
+      default:
+        return;
+    }
+
+    setChatHistory(prev => [...prev, { role: "model", text: response }]);
+  };
 
   const generateBotResponse = async (history) =>{
     // helper fun to update chat history
@@ -71,11 +88,14 @@ const App = () => {
          <div ref={chatBodyRef} className="chat-body">
               <div className="message bot-message">
                 <ChatbotIcon/>
-                <p className='message-text'>
-                  Hey Dear 👋 <br /> How can i help You?
-                </p>
-                <span className="message-timestamp">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                <div className="message-content">
+                  <p className='message-text'>
+                    Hey Dear 👋 <br /> How can i help You?
+                  </p>
+                  <span className="message-timestamp">{new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
               </div>
+              <QuickActions onActionClick={handleQuickAction} />
               {/* render the chat history dynamically */}
               {chatHistory.map((chat,index)=>(
                 <ChatMessage key={index} chat={chat} />
